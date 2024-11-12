@@ -1,0 +1,24 @@
+﻿<Window x:Class="Tasks_05___DNS_und_HTML_Tags.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Tasks_05___DNS_und_HTML_Tags"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="910">
+    <Grid>
+
+        <Border BorderBrush="Black" BorderThickness="1">
+            <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="41" Margin="0,-1,0,0" VerticalAlignment="Top" Width="910" Background="#FF009FB3">
+
+
+            </Border>
+        </Border>
+        <ListBox x:Name="NameListBox" Margin="10,44,678,10"/>
+        <ListBox x:Name="IPListBox" Margin="237,44,455,10"/>
+        <ListBox x:Name="TagsListBox" Margin="460,44,10,10"/>
+        <Label Content="IP-Adresse" HorizontalAlignment="Left" Margin="328,10,0,0" VerticalAlignment="Top" Background="#00000000" Foreground="White"/>
+        <Label Content="Tags" HorizontalAlignment="Left" Margin="460,9,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label x:Name="nameLabel" Content="Name:" Foreground="White" FontWeight="Bold" Margin="9,9,738,-1"/>
+    </Grid>
+</Window>

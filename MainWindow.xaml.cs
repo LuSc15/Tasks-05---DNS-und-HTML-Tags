@@ -43,10 +43,29 @@ namespace Tasks_05___DNS_und_HTML_Tags
                while((line =sr.ReadLine()) != null)
                 {
                     NameListBox.Items.Add(line);
-                    IPListBox.Items.Add(GetIP(line));
-                  
+                    try
+                    {
+                        IPListBox.Items.Add(GetIP(line));
+                    }
+                    catch 
+                    {
+                        IPListBox.Items.Add("Fehler beim auflösen");
+
+                    }
+
+                    try
+                    {
                         TagsListBox.Items.Add(CountTags(GetSourceCode(line)));
-                   
+
+                    }
+                    catch 
+                    {
+                        TagsListBox.Items.Add("Fehler beim einlesen");
+
+                    }
+
+
+
                 }
             }
             
@@ -64,34 +83,57 @@ namespace Tasks_05___DNS_und_HTML_Tags
         }
         public (string,Task) GetSourceCode(string adresse)
         {
+            if(adresse.Contains(','))               //Wenn mehrere Adressen im String sind, erste nehmen
+            {
+                adresse = adresse.Split(',')[0];
+            }
             
             //TaskListe.Clear();
 
-
+           
                 Task<string> task = Task.Run<string>(() =>
-            {
-            if (adresse != null)
-            {
-                HttpClient client = new HttpClient();
-                string html = client.GetStringAsync("https://" + adresse).Result;
-                return html;
-            }
-            return null;
-            });
-            TaskListe.Add(task);
-           Task.WaitAll(TaskListe.ToArray());
-            
-            return (task.Result,task);
+                {
+                    if (adresse != null)
+                    {
+                        HttpClient client = new HttpClient();
+                        try
+                        {
+                            string html = client.GetStringAsync("https://" + adresse).Result;       //yahoo.de liefert statt dem Quelltext nur 'OK\r\n' ?
+                            return html;
+                        }
+                        catch
+                        {
+                            Task.Run(() => MessageBox.Show(adresse + " konnte nicht gelesen werden"));  //Messagebox blockiert Mainwindow nicht durch Task
+                            string html = "error";
+                            return html;
+                        }
+                        
+                    }
+                    return null;
+                });
+                TaskListe.Add(task);
+                Task.WaitAll(TaskListe.ToArray());
+
+                return (task.Result, task);
+          
+      
            
         }
 
         public string CountTags((string source, Task t)tuple)
         {
+            if(tuple.source == "error")
+            {
+                return "Quelltext konnte nicht gelesen werden";
+            }
            Task<string> CountTagsTask = tuple.t.ContinueWith(t =>
             {
 
                 Dictionary<string, int> dict = new Dictionary<string, int>();
                 string[] zuSuchendeTags = { "<html", "<a", "<img" };
+
+            
+
 
                 foreach (string tag in zuSuchendeTags)
                 {

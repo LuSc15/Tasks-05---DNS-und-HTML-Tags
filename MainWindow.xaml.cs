@@ -32,10 +32,8 @@ namespace Tasks_05___DNS_und_HTML_Tags
             
         }
         public static List<Task>TaskListe = new List<Task>();
-        public static List<Task<string>> TaskListeString = new List<Task<string>>();
         public void ReadFile()
         {
-            // string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Adressen.txt");
             string filePath = "Adressen.txt";
             using (StreamReader sr = new StreamReader(filePath))
             {
@@ -50,7 +48,6 @@ namespace Tasks_05___DNS_und_HTML_Tags
                     catch 
                     {
                         IPListBox.Items.Add("Fehler beim auflösen");
-
                     }
 
                     try
@@ -61,15 +58,11 @@ namespace Tasks_05___DNS_und_HTML_Tags
                     catch 
                     {
                         TagsListBox.Items.Add("Fehler beim einlesen");
-
                     }
-
-
-
                 }
-            }
-            
+            }        
         }
+
         public string GetIP(string str)
         {
             string ipAdressen = "";
@@ -81,43 +74,38 @@ namespace Tasks_05___DNS_und_HTML_Tags
             ipAdressen = ipAdressen.Remove(ipAdressen.Length - 1);
             return ipAdressen;
         }
+
         public (string,Task) GetSourceCode(string adresse)
         {
             if(adresse.Contains(','))               //Wenn mehrere Adressen im String sind, erste nehmen
             {
                 adresse = adresse.Split(',')[0];
             }
-            
-            //TaskListe.Clear();
-
            
-                Task<string> task = Task.Run<string>(() =>
+            Task<string> task = Task.Run<string>(() =>
+            {
+                if (adresse != null)
                 {
-                    if (adresse != null)
+                    HttpClient client = new HttpClient();
+                    try
                     {
-                        HttpClient client = new HttpClient();
-                        try
-                        {
-                            string html = client.GetStringAsync("https://" + adresse).Result;       //yahoo.de liefert statt dem Quelltext nur 'OK\r\n' ?
-                            return html;
-                        }
-                        catch
-                        {
-                            Task.Run(() => MessageBox.Show(adresse + " konnte nicht gelesen werden"));  //Messagebox blockiert Mainwindow nicht durch Task
-                            string html = "error";
-                            return html;
-                        }
-                        
+                        string html = client.GetStringAsync("https://" + adresse).Result;       //yahoo.de liefert statt dem Quelltext nur 'OK\r\n' ?
+                        return html;
                     }
-                    return null;
-                });
-                TaskListe.Add(task);
-                Task.WaitAll(TaskListe.ToArray());
+                    catch
+                    {
+                        Task.Run(() => MessageBox.Show(adresse + " konnte nicht gelesen werden"));  //Messagebox blockiert Mainwindow nicht durch Task
+                        string html = "error";
+                        return html;
+                    }
+                        
+                }
+                return null;
+            });
+            TaskListe.Add(task);
+          //Task.WaitAll(TaskListe.ToArray());
 
-                return (task.Result, task);
-          
-      
-           
+            return (task.Result, task);  
         }
 
         public string CountTags((string source, Task t)tuple)
@@ -126,14 +114,11 @@ namespace Tasks_05___DNS_und_HTML_Tags
             {
                 return "Quelltext konnte nicht gelesen werden";
             }
+
            Task<string> CountTagsTask = tuple.t.ContinueWith(t =>
             {
-
                 Dictionary<string, int> dict = new Dictionary<string, int>();
                 string[] zuSuchendeTags = { "<html", "<a", "<img" };
-
-            
-
 
                 foreach (string tag in zuSuchendeTags)
                 {
@@ -146,10 +131,8 @@ namespace Tasks_05___DNS_und_HTML_Tags
                     tagString += kvp.Key + " - " + kvp.Value + ",";
                 }
                 return tagString;
-
             });
-            return CountTagsTask.Result;
-           
+            return CountTagsTask.Result; 
         }
     }
 }
